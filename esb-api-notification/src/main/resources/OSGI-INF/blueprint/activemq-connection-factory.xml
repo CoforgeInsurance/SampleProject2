@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cxf="http://camel.apache.org/schema/blueprint/cxf"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="              https://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd              http://camel.apache.org/schema/blueprint/cxf http://camel.apache.org/schema/blueprint/cxf/camel-cxf.xsd              http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+    <bean class="org.apache.activemq.ActiveMQConnectionFactory" id="jmsConnectionFactory-cop">
+        <property name="brokerURL" value="{{ACTIVEMQ_URL}}"/>
+    </bean>
+    <bean class="org.apache.activemq.pool.PooledConnectionFactory"
+        destroy-method="stop" id="pooledConnectionFactory-cop" init-method="start">
+        <property name="maxConnections" value="5"/>
+        <property name="maximumActiveSessionPerConnection" value="125"/>
+        <property name="connectionFactory" ref="jmsConnectionFactory-cop"/>
+    </bean>
+    <bean class="org.apache.camel.component.jms.JmsConfiguration" id="jmsConfig-cop">
+        <property name="connectionFactory" ref="pooledConnectionFactory-cop"/>
+        <property name="concurrentConsumers" value="1"/>
+        <property name="autoStartup" value="true"/>
+    </bean>
+    <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activemqcompcop">
+        <property name="configuration" ref="jmsConfig-cop"/>
+    </bean>
+</blueprint>

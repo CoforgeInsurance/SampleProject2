@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!-- Generated WSDL for gw.accelerators.mitchell.apd.ws.MitchellMessagingAPI 
+	web service -->
+<wsdl:definitions targetNamespace="http://guidewire.com/"
+	name="MitchellMessagingAPI" xmlns:gwsoap="http://guidewire.com/ws/soapheaders"
+	xmlns:gwwsdl="http://guidewire.com/pl/wsdl" xmlns:soap11="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:tns="http://guidewire.com/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+	<wsdl:types>
+		<xs:schema targetNamespace="http://guidewire.com/"
+			elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+			<xs:import namespace="http://guidewire.com/ws/soapheaders"
+				schemaLocation="src/main/resources/xsds/gwcc/soapheaders.xsd" />
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:portType name="MitchellMessagingAPIPortType" />
+	<wsdl:binding name="MitchellMessagingAPISoap12Binding"
+		type="tns:MitchellMessagingAPIPortType">
+		<soap12:binding transport="http://schemas.xmlsoap.org/soap/http"
+			style="document" />
+	</wsdl:binding>
+	<wsdl:binding name="MitchellMessagingAPISoap11Binding"
+		type="tns:MitchellMessagingAPIPortType">
+		<soap11:binding transport="http://schemas.xmlsoap.org/soap/http"
+			style="document" />
+	</wsdl:binding>
+	<wsdl:service name="MitchellMessagingAPI">
+		<wsdl:port name="MitchellMessagingAPISoap12Port" binding="tns:MitchellMessagingAPISoap12Binding">
+			<soap12:address
+				location="http://yyzgws5211.ana.corp.aviva.com:9083/cc/ws/gw/accelerators/mitchell/apd/ws/MitchellMessagingAPI/soap11" />
+			<gwwsdl:address
+				location="${cc}/ws/gw/accelerators/mitchell/apd/ws/MitchellMessagingAPI" />
+		</wsdl:port>
+		<wsdl:port name="MitchellMessagingAPISoap11Port" binding="tns:MitchellMessagingAPISoap11Binding">
+			<soap11:address
+				location="http://yyzgws5211.ana.corp.aviva.com:9083/cc/ws/gw/accelerators/mitchell/apd/ws/MitchellMessagingAPI/soap11/soap11" />
+			<gwwsdl:address
+				location="${cc}/ws/gw/accelerators/mitchell/apd/ws/MitchellMessagingAPI/soap11" />
+		</wsdl:port>
+	</wsdl:service>
+	<wsdl:message name="gw-authentication">
+		<wsdl:part name="gw-authentication" element="gwsoap:authentication" />
+	</wsdl:message>
+	<wsdl:message name="gw-locale-only">
+		<wsdl:part name="gw-locale-only" element="gwsoap:gw_locale" />
+	</wsdl:message>
+	<wsdl:message name="gw-language-only">
+		<wsdl:part name="gw-language-only" element="gwsoap:gw_language" />
+	</wsdl:message>
+	<wsdl:message name="gw-transaction-id">
+		<wsdl:part name="gw-transaction-id" element="gwsoap:transaction_id" />
+	</wsdl:message>
+</wsdl:definitions>

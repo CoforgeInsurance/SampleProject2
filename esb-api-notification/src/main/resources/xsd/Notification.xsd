@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated Schema for ClaimNotification webservice version 1.0, date 2018 Sept 20 -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:ntfy="http://www.avivacanada.com/services/fuse/notification/v1"
+	elementFormDefault="qualified"
+	targetNamespace="http://www.avivacanada.com/services/fuse/notification/v1">
+
+	<xs:simpleType name="YesNo">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Y" />
+			<xs:enumeration value="N" />
+			<xs:length value="1"></xs:length>
+		</xs:restriction>
+	</xs:simpleType>
+		
+	<xs:simpleType name="ClientIDType">
+		<xs:annotation>
+			<xs:documentation>system id that can access this service</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CC" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ClientNameType">
+		<xs:annotation>
+			<xs:documentation>system name that can access this service
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ClaimCenter" />
+		</xs:restriction>
+	</xs:simpleType>
+		
+	<xs:complexType name="ClientInfoType">
+		<xs:sequence>
+			<xs:element name="clientID" type="ntfy:ClientIDType" minOccurs="1" nillable="false" maxOccurs="1"/>
+			<xs:element name="clientName" type="ntfy:ClientNameType" minOccurs="1" nillable="false" maxOccurs="1"/>
+			<xs:element name="requestReference" minOccurs="1" nillable="false" maxOccurs="1">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"></xs:minLength>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="transactionTime" type="xs:dateTime" minOccurs="1" nillable="false" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="Language">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="en_US" />
+			<xs:enumeration value="fr_CA" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="PhoneCategoryType">
+		<xs:annotation>
+			<xs:documentation>List of Phone Types
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="MOBILE" />
+			<xs:enumeration value="LANDLINE" />
+			<xs:enumeration value="FAX" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="PhoneNumber">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="15"></xs:maxLength>
+			<xs:minLength value="10"></xs:minLength>
+			<xs:pattern value="[0-9,+]+"></xs:pattern>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:complexType name="PhoneType">
+		<xs:sequence>
+			<xs:element name="number" type="ntfy:PhoneNumber" minOccurs="1" nillable="false" maxOccurs="1" />
+			<xs:element name="category"	type="ntfy:PhoneCategoryType" minOccurs="1"  nillable="false" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+				
+	<xs:complexType name="NotificationIdentifierType">
+		<xs:sequence>
+			<xs:element name="number" type="xs:string" minOccurs="1" nillable="false" maxOccurs="1" />
+			<xs:element name="category"	type="ntfy:IdentificationCategoryType" minOccurs="1"  nillable="false"	maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:simpleType name="IdentificationCategoryType">
+		<xs:annotation>
+			<xs:documentation>List of Notification Types
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="PolicyNumber" />
+			<xs:enumeration value="ClaimNumber" />
+		</xs:restriction>
+	</xs:simpleType>
+
+<!-- 	<xs:simpleType name="NotificationCategoryType"> -->
+<!-- 		<xs:annotation> -->
+<!-- 			<xs:documentation>List of Notification Categories -->
+<!-- 			</xs:documentation> -->
+<!-- 		</xs:annotation> -->
+<!-- 		<xs:restriction base="xs:string"> -->
+<!-- 			<xs:enumeration value="Real" /> -->
+<!-- 			<xs:enumeration value="Batch" /> -->
+<!-- 		</xs:restriction> -->
+<!-- 	</xs:simpleType> -->
+				
+	<xs:complexType name="detailException">
+		<xs:sequence>
+			<xs:element name="errorCode" type="xs:string" />
+			<xs:element minOccurs="0" name="errorMessage" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="BaseRequest">
+		<xs:sequence>
+			<xs:element name="clientInfo" type="ntfy:ClientInfoType" />
+			<xs:element name="language" type="ntfy:Language" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="BaseResponse">
+		<xs:sequence>
+			<xs:element name="clientInfo" type="ntfy:ClientInfoType" />
+			<xs:element name="isSuccessful" type="ntfy:YesNo" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType	name="SendPhoneNotificationResponse">
+		<xs:complexContent>
+			<xs:extension base="ntfy:BaseResponse">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType
+		name="SendPhoneNotificationRequest">
+		<xs:complexContent>
+			<xs:extension base="ntfy:BaseRequest">
+				<xs:sequence>
+					<xs:element name="notificationCategory" maxOccurs="1" minOccurs="1" nillable="false">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="Real"></xs:enumeration>
+								<xs:enumeration value="Batch"></xs:enumeration>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="phone" type="ntfy:PhoneType" maxOccurs="1" minOccurs="1" nillable="false"/>
+					<xs:element name="identifier" maxOccurs="1"	minOccurs="1" nillable="false" type="ntfy:NotificationIdentifierType"/>
+					<xs:element name="underwritingCompany" maxOccurs="1"
+						minOccurs="1" nillable="false">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="1"></xs:minLength>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="contactId" type="xs:string" nillable="false" maxOccurs="1" />
+					<xs:element name="message" maxOccurs="1"
+						minOccurs="1" nillable="false">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="1"></xs:minLength>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element name="sendPhoneNotificationRq"	type="ntfy:SendPhoneNotificationRequest" />
+	<xs:element name="sendPhoneNotificationRs"	type="ntfy:SendPhoneNotificationResponse" />
+	<xs:element name="SOAPServiceException" nillable="true" type="ntfy:detailException"/>
+</xs:schema>         

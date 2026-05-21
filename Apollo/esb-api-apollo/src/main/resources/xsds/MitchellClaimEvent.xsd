@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.mitchell.com/schemas/mitchellclaimevent" targetNamespace="http://www.mitchell.com/schemas/mitchellclaimevent" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+  <xs:element name="MitchellClaimEvent">
+    <xs:annotation>
+      <xs:documentation>This is a draft of the schema and is subject to change</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="EventCode" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>This indicates the type of event</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="EventDescription" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>This description will be subject to change and should not be used to drive any logic</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="EventDateTime" type="xs:dateTime"/>
+        <xs:element name="ClaimNumber" minOccurs="0" type="xs:string"/> <!-- claim number should be the "client claim number" meaning the claim number before it is parsed -->
+        <xs:element name="User">
+          <xs:annotation>
+            <xs:documentation>The user relevant to the event, e.g. in the event of an assignment download, this will be the user downloading the assignment
+ComparyCode = 2 alphanumeric code to identify the Insurance Carrier
+User ID = an 8 alpha numeric identifier of the user
+Type = a code indicating the type of user: STAFF (indicates Carrier Employee), SHOP, IA.
+		</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="CompanyCode" type="xs:string"/>
+              <xs:element name="UserID" type="xs:string"/>
+              <xs:element name="Name" type="xs:string"/>
+              <xs:element name="Type" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ApplicationURIList" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>URI to get to the relevant item in Work Center</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ApplicationName" type="xs:string"/>
+              <xs:element name="ApplicationURI" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="EventDetails" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Additional information on the event, which varies for different event codes</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+            <!-- This is taken from MitchellEnvelope -->
+              <xs:element name="NameValuePair" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:annotation>
+                    <xs:documentation>
+ Arrays of values are supported by using multiple value elements for a single name element.
+ Developers are discouraged from storing aggregates of data as the value e.g. XML Blobs.
+ Developers are encouraged to disassemble aggregates of data into individual name/value pairs.
+ Best practice is to use Mitchell Application Logging Service conventions for name.
+ See http://dev72nt:9080/archweb/projects/CoreServices/AppLoggingEnhancements
+                    </xs:documentation>
+                  </xs:annotation>
+                  <xs:sequence>
+                    <xs:element name="Name" type="xs:string"/>
+                    <xs:element name="Value" type="xs:string" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="MitchellWorkItemId" type="xs:string"/>
+      </xs:sequence>
+      <xs:attribute name="Version" type="VersionNumberType" fixed="1.0"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MitchellClaimEventList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="MitchellClaimEvent" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="VersionNumberType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([0-9])?[0-9].[0-9]([0-9])?"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

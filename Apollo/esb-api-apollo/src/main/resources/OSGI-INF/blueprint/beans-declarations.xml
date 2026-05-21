@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+	xmlns:cxf="http://camel.apache.org/schema/blueprint/cxf" xmlns:jaxws="http://cxf.apache.org/blueprint/jaxws"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://www.osgi.org/xmlns/blueprint/v1.0.0        http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd                    http://camel.apache.org/schema/blueprint/cxf             http://camel.apache.org/schema/blueprint/cxf/camel-cxf.xsd                      http://camel.apache.org/schema/blueprint                       http://camel.apache.org/schema/blueprint/camel-blueprint.xsd                      http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0                       http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd">
+	<reference availability="mandatory"
+		filter="(osgi.jndi.service.name=service/oracleds)" id="oracle-db"
+		interface="javax.sql.DataSource" timeout="0" />
+	<bean class="org.apache.camel.component.sql.SqlComponent" id="oracle">
+		<property name="dataSource" ref="oracle-db" />
+	</bean>
+	<reference availability="mandatory"
+		filter="(propertiesConfig.name=propertiesLoader)" id="properties-conf"
+		interface="com.aviva.ca.esb.core.conf.client.api.PropertiesLoaderService" />
+
+	<bean class="org.apache.cxf.feature.LoggingFeature" id="loggingFeature" />
+	<bean class="org.apache.cxf.jaxrs.security.JAASAuthenticationFilter"
+		id="authenticationFilter">
+		<!-- Name of the JAAS Context -->
+		<property name="contextName" value="{{LDAP_CONTEXT_NAME}}" />
+	</bean>
+
+	<bean
+		class="com.aviva.ca.esb.core.conf.logging.transactionlog.TransactionLogging"
+		id="transactionLogging" />
+
+	<bean
+		class="com.aviva.ca.esb.core.conf.logging.transactionlog.TransactionLog"
+		id="transactionLog" init-method="init">
+		<argument type="java.util.List">
+			<list>
+				<value>com.mitchell.schemas.mitchellclaimevent.MitchellClaimEvent
+				</value>
+				<value>com.mitchell.schemas.filedelivery.FileReceiverServiceRs
+				</value>
+				<value>com.org.openuri.ReceiveFileResponse</value>
+			</list>
+		</argument>
+		<argument type="java.util.List">
+			<list>
+				<value>com.mitchell.schemas.mitchellclaimevent.Apollo
+				</value>
+			</list>
+		</argument>
+	</bean>
+	<bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor"
+		id="WSSECAuthenticate">
+		<property name="properties">
+			<map>
+				<entry key="action" value="UsernameToken" />
+				<entry key="passwordType" value="PasswordText" />
+			</map>
+		</property>
+	</bean>
+	<bean class="org.apache.cxf.interceptor.security.JAASLoginInterceptor"
+		id="authenticationInterceptor">
+		<!-- Name of the JAAS Context -->
+		<property name="contextName" value="{{LDAP_CONTEXT_NAME}}" />
+		<property name="roleClassifier" value="RolePrincipal" />
+		<property name="roleClassifierType" value="classname" />
+	</bean>
+	<bean class="com.aviva.ca.esb.core.conf.cxf.features.InboundFeature"
+		id="inBoundFeature">
+		<argument index="0" ref="oracle" />
+		<argument index="1" value="{{DB_LOGGING}}" />
+	</bean>
+	<bean
+		class="org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor"
+		id="authorizationInterceptor">
+		<property name="methodRolesMap">
+			<map>
+				<entry key="receiveFile" value="eFuseEsbSvcAccess" />
+			</map>
+		</property>
+	</bean>
+	<bean class="com.aviva.ca.esb.api.apollo.processor.LoggingProcessor"
+		id="loggingProcessor">
+		<argument index="0" ref="transactionLog" />
+	</bean>
+	<bean class="org.apache.camel.impl.DefaultHeaderFilterStrategy"
+		id="activeMQHeaderFilter">
+		<property name="outFilter">
+			<set>
+				<value>Authorization</value>
+			</set>
+		</property>
+	</bean>
+	<bean class="com.aviva.ca.esb.api.apollo.processor.InitialQueuePostProcessor"
+		id="initialQueuePostProcessor">
+		<argument index="0" ref="transactionLog" />
+	</bean>
+	<bean class="com.aviva.ca.esb.api.apollo.processor.InitialQueuePreProcessor"
+		id="initialQueuePreProcessor" />
+	<bean class="com.aviva.ca.esb.api.apollo.processor.ApolloResponseMapper"
+		id="apolloResponseMapper" />
+	<bean class="com.aviva.ca.esb.api.apollo.processor.ApolloInputProcessor"
+		id="apolloInputProcessor" />
+		<bean class="com.aviva.ca.esb.api.apollo.processor.ErrorHandler" id="errorHandler"/>
+	<bean class="com.aviva.ca.esb.api.apollo.client.ApolloCCServiceClient"
+		id="apolloCCServiceClient">
+		<argument index="0" ref="apolloCCSoapProxy" />
+		<argument index="1" value="{{APOLLO_CC_ENDPOINT_URL}}" />
+		<argument index="2" value="{{APOLLO_CC_SERVICE_TIMEOUT}}" />
+		<argument index="3" value="{{APOLLO_CC_SERVICE_USER}}" />
+		<argument index="4" value="{{APOLLO_CC_SERVICE_KEY}}" />
+	</bean>
+</blueprint>

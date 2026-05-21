@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:camel="http://camel.apache.org/schema/blueprint"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd        http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+    <routeContext id="notificationcallback_unsubscribe" xmlns="http://camel.apache.org/schema/blueprint">
+        <route id="notificationUnsubscribeInboundRoute">
+            <from uri="direct:unsubscribe"/>
+            <log loggingLevel="INFO" message="lognotify: Unsubscribe Route has been invoked"/>
+            <doTry>
+                <setProperty propertyName="APPLICATION_ID">
+                    <simple>FUSE</simple>
+                </setProperty>
+                <setProperty propertyName="transactionLog">
+                    <simple>ref:transactionLog</simple>
+                </setProperty>
+                <setHeader headerName="logOperation">
+                    <simple>insertInboundRequest</simple>
+                </setHeader>
+                <process ref="notificationUnsubscribeRqLogging"/>
+                <log loggingLevel="INFO" message="lognotify: notification unsubscribe logging"/>
+                <to uri="direct-vm:transactionloggingGateway"/>
+                <log loggingLevel="INFO" message="lognotify: Successfully Logged notification unsubscribe request"/>
+                <log message="lognotify: To validate the json request message"/>
+                <process ref="notificationUnsubscribeRqValidator"/>
+                <removeProperty propertyName="APPLICATION_ID"/>
+                <log message="lognotify: To Unsubscribe request mapper"/>
+                <process ref="notificationUnsubscribeRqMapper"/>
+                <to uri="direct:notificationunsubscribeOutbound"/>
+                <doCatch>
+                    <exception>java.lang.Exception</exception>
+                    <handled>
+                        <constant>true</constant>
+                    </handled>
+                    <log message="lognotify: To log the unsubscribe request message failure before claim center invoker"/>
+                    <to uri="direct:notificationUnsubscribeInboundError"/>
+                </doCatch>
+            </doTry>
+        </route>
+        <route id="notificationunsubscribeOutboundRoute">
+            <from uri="direct:notificationunsubscribeOutbound"/>
+            <doTry>
+                <setProperty propertyName="APPLICATION_ID">
+                    <simple>CC</simple>
+                </setProperty>
+                <setHeader headerName="userNameKey">
+                    <simple>CC_DIGITALNOTIFICATIONSERVICE_USERNAME</simple>
+                </setHeader>
+                <setProperty propertyName="SERVICE">
+                    <simple resultType="java.lang.String">UnsubscribeClaimCenterService</simple>
+                </setProperty>
+                <setProperty propertyName="ccCreateClaimPwd">
+					<simple>${bean:ccCreateClaimPwd.toString}</simple>
+				</setProperty>
+                <log message="lognotify: To invoke claimcenter"/>
+                <to pattern="InOut" uri="bean:claimcenterNotificationInvoker"/>
+                <setHeader headerName="logOperation">
+                    <simple>insertOutbound</simple>
+                </setHeader>
+                <log message="lognotify: To log the outbound request message to claim center"/>
+                <to uri="direct-vm:transactionloggingGateway"/>
+                <removeProperty propertyName="APPLICATION_ID"/>
+                <removeHeader headerName="userNameKey"/>
+                <removeProperty propertyName="OUBOUND_USER"/>
+                <process ref="notificationUnsubscribeRsMapper"/>
+                <setProperty propertyName="InboundProducesType">
+                    <simple>json</simple>
+                </setProperty>
+                <setHeader headerName="logOperation" id="_setHeader4UnsubscribeInboundResponse">
+                    <simple>updateInboundResponse</simple>
+                </setHeader>
+                <to uri="direct-vm:transactionloggingGateway"/>
+                <log loggingLevel="INFO" message="lognotify: Successfully Logged unsubscribe response"/>
+                <doCatch>
+                    <exception>com.avivacanada.services.fuse.notification.v1.SOAPServiceException</exception>
+                    <handled>
+                        <constant>true</constant>
+                    </handled>
+                    <to uri="direct:notificationUnsubscribeOutboundError"/>
+                </doCatch>
+            </doTry>
+            <bean method="setResponse" ref="transactionLogging"/>
+            <to uri="log:output"/>
+        </route>
+        <route id="direct:notificationUnsubscribeInboundErrorRoute">
+            <from uri="direct:notificationUnsubscribeInboundError"/>
+            <log loggingLevel="INFO" message="lognotify: Unsubscribe exception is captured in Inbound Error Route and response will be generated"/>
+            <process ref="notificationUnsubscribeRsErrorMapper"/>
+            <to pattern="InOnly" uri="activemqcompcop:{{COP_CLAIMNOTIFICATION_ERROR_QUEUE}}"/>
+            <log loggingLevel="INFO" message="lognotify: The message has been put into the error queue for claim center"/>
+            <setHeader headerName="logOperation">
+                <simple>updateError</simple>
+            </setHeader>
+            <to uri="direct-vm:transactionloggingGateway"/>
+            <log loggingLevel="INFO" message="lognotify: Successfully Logged Unsubscribe update inbound Error"/>
+        </route>
+        <route id="direct:notificationUnsubscribeOutboundErrorRoute">
+            <from uri="direct:notificationUnsubscribeOutboundError"/>
+            <log loggingLevel="INFO" message="lognotify: unsubscribe exception is captured in outbound Error Route and response will be generated"/>
+            <process ref="notificationUnsubscribeRsErrorQueue"/>
+            <to pattern="InOnly" uri="activemqcompcop:{{COP_CLAIMNOTIFICATION_ERROR_QUEUE}}"/>
+            <process ref="notificationUnsubscribeRsErrorMapper"/>
+            <log loggingLevel="INFO" message="lognotify: The message has been put into the error queue for claim center"/>
+            <setProperty propertyName="OUT_RESPONSE_MSG_TYPE">
+                <simple>text/xml;charset=UTF-8</simple>
+            </setProperty>
+            <setHeader headerName="logOperation">
+                <simple>insertOutboundOriginalErr</simple>
+            </setHeader>
+            <to uri="direct-vm:transactionloggingGateway"/>
+            <log loggingLevel="INFO" message="lognotify: Successfully Logged unsubscribe Outbound Original Error"/>
+            <setProperty propertyName="InboundProducesType">
+                <simple>json</simple>
+            </setProperty>
+            <setHeader headerName="logOperation" id="_setHeader6">
+                <simple>updateInboundResponse</simple>
+            </setHeader>
+            <to uri="direct-vm:transactionloggingGateway"/>
+            <log loggingLevel="INFO" message="lognotify: Successfully Logged unsubscribe outbound error response"/>
+        </route>
+    </routeContext>
+</blueprint>

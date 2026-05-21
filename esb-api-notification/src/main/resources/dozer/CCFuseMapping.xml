@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dozer.sourceforge.net http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+	<mapping map-id="rbcClientInfo_ccClientInfo" map-null="false">
+		<class-a>com.avivacanada.schema.rbcservices.cdw.v1.BaseRequest
+		</class-a>
+		<class-b>com.avivacanada.cc.ws.com.avivacanada.integration.webservice.cdw.schema.cdwclaimcreateserviceapi.ClientInfoType
+		</class-b>
+<!-- 		<field>
+			<a>clientInfo.clientID</a>
+			<b>clientID</b>
+		</field> -->		
+		<field>
+			<a>clientInfo.clientName</a>
+			<b>clientName</b>
+		</field>
+		<field>
+			<a>clientInfo.clientGUID</a>
+			<b>requestReference</b>
+		</field>
+		<field>
+			<a>clientInfo.transactionTime</a>
+			<b>transactionTime</b>
+		</field>
+	</mapping>
+
+<!-- 	<mapping map-id="rbcClaimInfo_ccClaimInfo" map-null="false">
+		<class-a>com.avivacanada.schema.rbcservices.cdw.v1.ClaimInfoType
+		</class-a>
+		<class-b>com.avivacanada.cc.ws.com.avivacanada.integration.webservice.cdw.schema.cdwclaimcreateserviceapi.ClaimInfoType
+		</class-b>
+	</mapping>
+ -->
+ 	
+	<mapping map-id="rbcClaimInfo_ccClaimInfo" map-null="false">
+		<class-a>com.avivacanada.schema.rbcservices.cdw.v1.ClaimInfoType
+		</class-a>
+		<class-b>com.avivacanada.cc.ws.com.avivacanada.integration.webservice.cdw.schema.cdwclaimcreateserviceapi.ClaimInfoType
+		</class-b>
+		<field>
+			<a>referenceInformation</a>
+			<b>referenceInformation</b>
+		</field>
+		<field map-id="rbcCardholderInformation_ccCardholderInformation">
+			<a>cardholderInformation</a>
+			<b>cardholderInformation</b>
+		</field>
+		<field map-id="rbcCallerInformation_ccCallerInformation">
+			<a>callerInformation</a>
+			<b>callerInformation</b>
+		</field>
+		<field>
+			<a>lossInformation</a>
+			<b>lossInformation</b>
+		</field>
+		<field>
+			<a>otherInformation</a>
+			<b>otherInformation</b>
+		</field>
+	</mapping>
+	<mapping map-id="rbcCardholderInformation_ccCardholderInformation"	map-null="false">
+		<class-a>com.avivacanada.schema.rbcservices.cdw.v1.CardholderInformationType
+		</class-a>
+		<class-b>com.avivacanada.cc.ws.com.avivacanada.integration.webservice.cdw.schema.cdwclaimcreateserviceapi.CardholderInformationType
+		</class-b>
+		<field>
+			<a>lastName</a>
+			<b>lastName</b>
+		</field>
+		<field>
+			<a>firstName</a>
+			<b>firstName</b>
+		</field>
+		<field>
+			<a>address</a>
+			<b>address</b>
+		</field>
+		<field>
+			<a>city</a>
+			<b>city</b>
+		</field>
+		<field>
+			<a>province</a>
+			<b>province</b>
+		</field>
+ 		<field>
+			<a>postalCode</a>
+			<b>postalCode</b>
+		</field>
+ 		<field>
+			<a>homePhoneNumber</a>
+			<b>homePhoneNumber</b>
+		</field>
+ 		<field>
+			<a>workPhoneNumber</a>
+			<b>workPhoneNumber</b>
+		</field>
+ 		<field>
+			<a>cardNumber</a>
+			<b>cardNumber</b>
+		</field>
+ 	<!-- 	<field>
+			<a>cardType</a>
+			<b>cardType</b>
+		</field> -->
+ 		<field>
+			<a>paidInFull</a>
+			<b>paidInFull</b>
+		</field>
+ 		<field>
+			<a>purchasedCDW</a>
+			<b>purchasedCDW</b>
+		</field>				
+	</mapping>
+	<mapping map-id="rbcCallerInformation_ccCallerInformation"	map-null="false">
+		<class-a>com.avivacanada.schema.rbcservices.cdw.v1.CallerInformationType
+		</class-a>
+		<class-b>com.avivacanada.cc.ws.com.avivacanada.integration.webservice.cdw.schema.cdwclaimcreateserviceapi.CallerInformationType
+		</class-b>
+<!-- 		<field>
+			<a>relationshipCode</a>
+			<b>relationshipCode</b>
+		</field> -->
+		<field>
+			<a>callerLastName</a>
+			<b>callerLastName</b>
+		</field>
+		<field>
+			<a>callerFirstname</a>
+			<b>callerFirstname</b>
+		</field>
+		<field>
+			<a>callerPhoneNumber</a>
+			<b>callerPhoneNumber</b>
+		</field>
+<!-- 		<field>
+			<a>callerContactCountry</a>
+			<b>callerContactCountry</b>
+		</field> -->
+<!-- 		<field>
+			<a>callerLanguage</a>
+			<b>callerLanguage</b>
+		</field> -->
+		<field>
+			<a>contactNumber</a>
+			<b>contactNumber</b>
+		</field>
+<!-- 		<field>
+			<a>contactCountry</a>
+			<b>contactCountry</b>
+		</field> -->
+	</mapping>
+
+	<mapping map-id="rbcCreateClaimRequest_ccCreateClaimRequest"
+		map-null="false">
+		<class-a>com.avivacanada.schema.rbcservices.cdw.v1.CreateClaimRequest
+		</class-a>
+		<class-b>com.avivacanada.cc.ws.com.avivacanada.integration.webservice.cdw.schema.cdwclaimcreateserviceapi.ClaimCreateRq
+		</class-b>
+		<field map-id="rbcClientInfo_ccClientInfo">
+			<a>baseRequest</a>
+			<b>clientInfo</b>
+		</field>
+		<field map-id="rbcClaimInfo_ccClaimInfo">
+			<a>claimInfo</a>
+			<b>claimInfo</b>
+		</field>
+	</mapping>
+
+</mappings>
